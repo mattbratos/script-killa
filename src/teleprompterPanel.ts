@@ -265,17 +265,8 @@ export class TeleprompterPanel {
 	<title>Teleprompter</title>
 </head>
 <body>
+	<!-- Top toolbar: display settings -->
 	<div id="toolbar">
-		<div class="toolbar-group">
-			<button id="btn-play" title="Play / Pause (Space)">> play</button>
-		</div>
-		<div class="toolbar-separator"></div>
-		<div class="toolbar-group">
-			<label>spd</label>
-			<input type="range" id="speed-slider" min="0" max="100" value="20" step="1">
-			<span class="mono-value" id="speed-value">20</span>
-		</div>
-		<div class="toolbar-separator"></div>
 		<div class="toolbar-group">
 			<label>width</label>
 			<input type="range" id="width-slider" min="200" max="1200" value="600" step="25">
@@ -301,6 +292,19 @@ export class TeleprompterPanel {
 		</div>
 		<div class="toolbar-separator"></div>
 		<div class="toolbar-group">
+			<label>align</label>
+			<button id="btn-align-left" class="align-btn active" title="Align left">L</button>
+			<button id="btn-align-center" class="align-btn" title="Align center">C</button>
+			<button id="btn-align-right" class="align-btn" title="Align right">R</button>
+		</div>
+		<div class="toolbar-separator"></div>
+		<div class="toolbar-group">
+			<label>guide</label>
+			<input type="range" id="guide-slider" min="10" max="80" value="35" step="1">
+			<span class="mono-value" id="guide-value">35</span><span class="mono-value">%</span>
+		</div>
+		<div class="toolbar-separator"></div>
+		<div class="toolbar-group">
 			<label>
 				<input type="checkbox" id="mirror-toggle">
 				mirror
@@ -308,15 +312,44 @@ export class TeleprompterPanel {
 		</div>
 	</div>
 
+	<!-- Dim overlay above reading line -->
+	<div id="dim-overlay"></div>
+
+	<!-- Reading guide line -->
 	<div id="reading-guide"></div>
 
+	<!-- Reading position indicator (arrow on left) -->
+	<div id="reading-indicator">
+		<svg width="28" height="28" viewBox="0 0 28 28">
+			<polygon points="0,6 22,14 0,22" fill="#00ff88" opacity="0.7"/>
+		</svg>
+	</div>
+
+	<!-- Main scroll area -->
 	<div id="teleprompter-container">
 		<div id="dialogue-area"></div>
 	</div>
 
-	<div id="status-bar">
-		<div><span class="status-dot" id="status-dot"></span><span id="status-text">ready</span></div>
-		<div id="block-count">--</div>
+	<!-- Bottom control bar: play, speed, status -->
+	<div id="bottom-bar">
+		<div class="bottom-status">
+			<span class="status-dot" id="status-dot"></span>
+			<span id="status-text">ready</span>
+		</div>
+
+		<div class="bottom-group">
+			<label>spd</label>
+			<input type="range" id="bottom-speed-slider" min="0" max="100" value="20" step="1">
+			<span class="mono-value" id="bottom-speed-value">20</span>
+		</div>
+
+		<button id="btn-play-main" title="Play / Pause (Space)">
+			<svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20"/></svg>
+		</button>
+
+		<div class="bottom-info" id="block-count">--</div>
+
+		<span class="spacebar-hint">space</span>
 	</div>
 
 	<script nonce="${nonce}" src="${jsUri}"></script>
