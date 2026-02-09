@@ -1,7 +1,7 @@
 {
   "name": "script-killa",
   "displayName": "script-killa",
-  "description": "teleprompter for .fountain ",
+  "description": "Teleprompter for .fountain screenplay files",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.109.0"
@@ -9,26 +9,80 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onLanguage:fountain"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
+    "languages": [
+      {
+        "id": "fountain",
+        "aliases": ["Fountain", "fountain"],
+        "extensions": [".fountain"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
     "commands": [
       {
-        "command": "script-killa.helloWorld",
-        "title": "Hello World"
+        "command": "script-killa.openTeleprompter",
+        "title": "Open Teleprompter",
+        "icon": "$(play)",
+        "category": "Script Killa"
       }
-    ]
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "when": "resourceExtname == .fountain",
+          "command": "script-killa.openTeleprompter",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Script Killa Teleprompter",
+      "properties": {
+        "script-killa.hiddenCharacters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": ["MATT"],
+          "description": "Character names to hide in the teleprompter view. Names are matched case-insensitively."
+        },
+        "script-killa.fontSize": {
+          "type": "number",
+          "default": 32,
+          "minimum": 16,
+          "maximum": 72,
+          "description": "Default font size (px) for the teleprompter display."
+        },
+        "script-killa.fontFamily": {
+          "type": "string",
+          "default": "sans-serif",
+          "enum": ["sans-serif", "serif", "monospace", "Georgia, serif", "'Courier New', monospace"],
+          "description": "Default font family for the teleprompter display."
+        },
+        "script-killa.scrollSpeed": {
+          "type": "number",
+          "default": 20,
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Default auto-scroll speed (pixels per second)."
+        }
+      }
+    }
   },
   "scripts": {
-    "vscode:prepublish": "npm run package",
-    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "vscode:prepublish": "pnpm run package",
+    "compile": "pnpm run check-types && pnpm run lint && node esbuild.js",
     "watch": "npm-run-all -p watch:*",
     "watch:esbuild": "node esbuild.js --watch",
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
-    "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "package": "pnpm run check-types && pnpm run lint && node esbuild.js --production",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
-    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
     "test": "vscode-test"

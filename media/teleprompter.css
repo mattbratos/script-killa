@@ -1,0 +1,209 @@
+/* === Reset & Base === */
+*, *::before, *::after {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+html, body {
+	height: 100%;
+	overflow: hidden;
+	background: #000;
+	color: #f0f0f0;
+	font-family: sans-serif;
+}
+
+/* === Toolbar === */
+#toolbar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 100;
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	padding: 8px 16px;
+	background: rgba(20, 20, 20, 0.92);
+	border-bottom: 1px solid #333;
+	backdrop-filter: blur(8px);
+	transition: opacity 0.3s ease;
+	flex-wrap: wrap;
+}
+
+#toolbar.faded {
+	opacity: 0.15;
+	pointer-events: none;
+}
+
+#toolbar:hover {
+	opacity: 1 !important;
+	pointer-events: auto !important;
+}
+
+.toolbar-group {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.toolbar-group label {
+	font-size: 11px;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	color: #999;
+	user-select: none;
+}
+
+#toolbar button {
+	padding: 4px 10px;
+	border: 1px solid #555;
+	border-radius: 4px;
+	background: #222;
+	color: #ddd;
+	font-size: 13px;
+	cursor: pointer;
+	transition: background 0.15s;
+}
+
+#toolbar button:hover {
+	background: #444;
+}
+
+#toolbar button:active {
+	background: #555;
+}
+
+#toolbar button.active {
+	background: #1a6b3a;
+	border-color: #2a8b4a;
+	color: #fff;
+}
+
+#speed-slider {
+	width: 100px;
+	accent-color: #4ade80;
+}
+
+#speed-value,
+#font-size-value {
+	font-size: 13px;
+	font-variant-numeric: tabular-nums;
+	min-width: 24px;
+	text-align: center;
+	color: #ccc;
+}
+
+#font-select {
+	padding: 3px 6px;
+	border: 1px solid #555;
+	border-radius: 4px;
+	background: #222;
+	color: #ddd;
+	font-size: 13px;
+}
+
+#mirror-toggle {
+	accent-color: #4ade80;
+}
+
+/* === Teleprompter Container === */
+#teleprompter-container {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	overflow-y: auto;
+	overflow-x: hidden;
+	scroll-behavior: auto;
+	padding-top: 56px; /* space for toolbar */
+}
+
+#teleprompter-container.mirrored {
+	transform: scaleX(-1);
+}
+
+#dialogue-area {
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 40px 24px 100vh; /* extra bottom padding so last line can scroll to top */
+}
+
+/* === Dialogue Blocks === */
+.dialogue-block {
+	margin-bottom: 2em;
+	position: relative;
+}
+
+.character-name {
+	font-size: 0.45em;
+	text-transform: uppercase;
+	letter-spacing: 1.5px;
+	color: #666;
+	margin-bottom: 0.25em;
+	user-select: none;
+	pointer-events: none;
+}
+
+.character-name.hidden {
+	display: none;
+}
+
+.dialogue-text {
+	line-height: 1.45;
+	color: #f0f0f0;
+	white-space: pre-wrap;
+	outline: none;
+	border-radius: 4px;
+	padding: 4px 6px;
+	margin: -4px -6px;
+	transition: background 0.2s ease;
+	cursor: text;
+}
+
+.dialogue-text:focus {
+	background: rgba(255, 255, 255, 0.06);
+}
+
+.dialogue-text.saved {
+	background: rgba(74, 222, 128, 0.12);
+}
+
+/* Parenthetical label */
+.parenthetical {
+	font-size: 0.5em;
+	color: #888;
+	font-style: italic;
+	margin-bottom: 0.15em;
+	user-select: none;
+}
+
+/* === Scrollbar === */
+#teleprompter-container::-webkit-scrollbar {
+	width: 6px;
+}
+
+#teleprompter-container::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+#teleprompter-container::-webkit-scrollbar-thumb {
+	background: #333;
+	border-radius: 3px;
+}
+
+#teleprompter-container::-webkit-scrollbar-thumb:hover {
+	background: #555;
+}
+
+/* === Empty state === */
+#dialogue-area:empty::after {
+	content: "No dialogue found.\a\aOpen a .fountain file and click the teleprompter button to get started.";
+	white-space: pre-wrap;
+	display: block;
+	text-align: center;
+	color: #555;
+	font-size: 18px;
+	margin-top: 30vh;
+}
