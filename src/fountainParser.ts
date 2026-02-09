@@ -259,9 +259,14 @@ export function parseFountainDialogue(text: string): DialogueBlock[] {
 			}
 
 			case 'dialogue': {
-				// Dialogue continues until a blank line
-				if (isBlank(line)) {
+				// In Fountain, dialogue continues until a truly empty line.
+				// A line with only whitespace (e.g. two spaces "  ") is a
+				// paragraph break WITHIN dialogue, not an end marker.
+				if (line.length === 0) {
 					finishBlock();
+				} else if (isBlank(line)) {
+					// Whitespace-only line = paragraph break within dialogue
+					dialogueLines.push('');
 				} else {
 					dialogueLines.push(line);
 				}

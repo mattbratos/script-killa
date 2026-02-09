@@ -6,9 +6,9 @@
 }
 
 :root {
-	--accent: #00ff88;
-	--accent-dim: rgba(0, 255, 136, 0.3);
-	--accent-glow: rgba(0, 255, 136, 0.15);
+	--accent: rgba(255, 255, 255, 0.6);
+	--accent-dim: rgba(255, 255, 255, 0.2);
+	--accent-glow: rgba(255, 255, 255, 0.08);
 	--bg: #000;
 	--surface: rgba(255, 255, 255, 0.04);
 	--border: rgba(255, 255, 255, 0.08);
@@ -66,24 +66,24 @@ body::after {
 	top: var(--reading-pos);
 	left: 0;
 	right: 0;
-	height: 2px;
+	height: 1px;
 	z-index: 90;
 	pointer-events: none;
 	background: linear-gradient(90deg,
 		transparent 0%,
-		var(--accent-glow) 10%,
-		var(--accent-dim) 50%,
-		var(--accent-glow) 90%,
+		rgba(255, 255, 255, 0.15) 5%,
+		rgba(255, 255, 255, 0.35) 50%,
+		rgba(255, 255, 255, 0.15) 95%,
 		transparent 100%
 	);
-	box-shadow: 0 0 30px var(--accent-glow);
+	box-shadow: 0 0 8px rgba(255, 255, 255, 0.05);
 }
 
 /* === Reading indicator arrow (left side) === */
 #reading-indicator {
 	position: fixed;
 	top: var(--reading-pos);
-	left: 0;
+	left: 4px;
 	z-index: 91;
 	pointer-events: none;
 	transform: translateY(-50%);
@@ -92,10 +92,28 @@ body::after {
 
 #reading-indicator svg {
 	display: block;
-	filter: drop-shadow(0 0 8px var(--accent-glow));
 }
 
-/* === Top toolbar (settings) === */
+/* === Invisible hover zones to reveal bars === */
+#toolbar-trigger {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 80px;
+	z-index: 99;
+}
+
+#bottom-trigger {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 80px;
+	z-index: 99;
+}
+
+/* === Top toolbar (settings) — hidden by default === */
 #toolbar {
 	position: fixed;
 	top: 0;
@@ -109,19 +127,18 @@ body::after {
 	background: rgba(0, 0, 0, 0.92);
 	border-bottom: 1px solid var(--border);
 	backdrop-filter: blur(16px) saturate(120%);
-	transition: opacity 0.4s ease;
+	transition: opacity 0.35s ease, transform 0.35s ease;
 	flex-wrap: wrap;
 	font-family: inherit;
-}
-
-#toolbar.faded {
 	opacity: 0;
 	pointer-events: none;
+	transform: translateY(-4px);
 }
 
-#toolbar:hover {
-	opacity: 1 !important;
-	pointer-events: auto !important;
+#toolbar.visible {
+	opacity: 1;
+	pointer-events: auto;
+	transform: translateY(0);
 }
 
 .toolbar-group {
@@ -145,8 +162,10 @@ body::after {
 	font-weight: 500;
 }
 
+/* Shared button styles */
 #toolbar button,
-.ctrl-btn {
+.ctrl-btn,
+.step-btn {
 	padding: 6px 14px;
 	border: 1px solid var(--border);
 	border-radius: 6px;
@@ -161,23 +180,32 @@ body::after {
 }
 
 #toolbar button:hover,
-.ctrl-btn:hover {
+.ctrl-btn:hover,
+.step-btn:hover {
 	background: rgba(255, 255, 255, 0.08);
 	border-color: rgba(255, 255, 255, 0.15);
 	color: #fff;
 }
 
 #toolbar button:active,
-.ctrl-btn:active {
+.ctrl-btn:active,
+.step-btn:active {
 	background: rgba(255, 255, 255, 0.12);
 }
 
 #toolbar button.active,
 .ctrl-btn.active {
-	background: rgba(0, 255, 136, 0.12);
-	border-color: rgba(0, 255, 136, 0.3);
-	color: var(--accent);
-	text-shadow: 0 0 8px var(--accent-glow);
+	background: rgba(255, 255, 255, 0.12);
+	border-color: rgba(255, 255, 255, 0.25);
+	color: #fff;
+}
+
+/* Step buttons (+/-) for toolbar controls */
+.step-btn {
+	padding: 4px 10px;
+	min-width: 32px;
+	text-align: center;
+	font-size: 16px;
 }
 
 /* Alignment buttons */
@@ -187,7 +215,7 @@ body::after {
 	text-align: center;
 }
 
-/* Range sliders — bigger for teleprompter distance */
+/* Range sliders */
 input[type="range"] {
 	-webkit-appearance: none;
 	appearance: none;
@@ -203,20 +231,19 @@ input[type="range"]::-webkit-slider-thumb {
 	width: 18px;
 	height: 18px;
 	border-radius: 50%;
-	background: var(--accent);
+	background: #fff;
 	cursor: pointer;
-	box-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
+	box-shadow: 0 0 6px rgba(255, 255, 255, 0.2);
 	transition: box-shadow 0.15s;
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
-	box-shadow: 0 0 16px rgba(0, 255, 136, 0.6);
+	box-shadow: 0 0 12px rgba(255, 255, 255, 0.35);
 }
 
-#speed-slider,
 #width-slider,
 #guide-slider {
-	width: 100px;
+	width: 80px;
 }
 
 .mono-value {
@@ -245,7 +272,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 #mirror-toggle {
-	accent-color: var(--accent);
+	accent-color: #fff;
 	width: 16px;
 	height: 16px;
 }
@@ -260,7 +287,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 	overflow-y: auto;
 	overflow-x: hidden;
 	scroll-behavior: auto;
-	padding-top: 56px;
+	padding-top: 0;
 	padding-bottom: 80px;
 }
 
@@ -271,7 +298,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 #dialogue-area {
 	max-width: 600px;
 	margin: 0 auto;
-	padding: 40px 32px 100vh;
+	padding: var(--reading-pos) 32px 100vh;
 	transition: max-width 0.3s ease, text-align 0.2s ease;
 }
 
@@ -289,19 +316,19 @@ input[type="range"]::-webkit-slider-thumb:hover {
 	top: 0;
 	bottom: 0;
 	width: 1px;
-	background: rgba(0, 255, 136, 0.06);
+	background: rgba(255, 255, 255, 0.04);
 	transition: background 0.3s;
 }
 
 .dialogue-block:hover::before {
-	background: rgba(0, 255, 136, 0.2);
+	background: rgba(255, 255, 255, 0.12);
 }
 
 .character-name {
 	font-size: 0.35em;
 	text-transform: uppercase;
 	letter-spacing: 3px;
-	color: rgba(0, 255, 136, 0.35);
+	color: rgba(255, 255, 255, 0.25);
 	margin-bottom: 0.35em;
 	user-select: none;
 	pointer-events: none;
@@ -331,21 +358,21 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .dialogue-text.saved {
-	background: rgba(0, 255, 136, 0.06);
-	box-shadow: inset 0 0 0 1px rgba(0, 255, 136, 0.15);
+	background: rgba(255, 255, 255, 0.04);
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 /* Parenthetical label */
 .parenthetical {
 	font-size: 0.4em;
-	color: rgba(255, 255, 255, 0.25);
+	color: rgba(255, 255, 255, 0.2);
 	font-style: italic;
 	margin-bottom: 0.2em;
 	user-select: none;
 	letter-spacing: 0.5px;
 }
 
-/* === Bottom control bar === */
+/* === Bottom control bar — hidden by default === */
 #bottom-bar {
 	position: fixed;
 	bottom: 0;
@@ -361,17 +388,16 @@ input[type="range"]::-webkit-slider-thumb:hover {
 	border-top: 1px solid var(--border);
 	backdrop-filter: blur(16px);
 	font-family: inherit;
-	transition: opacity 0.4s ease;
-}
-
-#bottom-bar.faded {
+	transition: opacity 0.35s ease, transform 0.35s ease;
 	opacity: 0;
 	pointer-events: none;
+	transform: translateY(4px);
 }
 
-#bottom-bar:hover {
-	opacity: 1 !important;
-	pointer-events: auto !important;
+#bottom-bar.visible {
+	opacity: 1;
+	pointer-events: auto;
+	transform: translateY(0);
 }
 
 /* Large play button */
@@ -395,9 +421,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 #btn-play-main.active {
-	background: rgba(0, 255, 136, 0.12);
-	border-color: rgba(0, 255, 136, 0.3);
-	color: var(--accent);
+	background: rgba(255, 255, 255, 0.12);
+	border-color: rgba(255, 255, 255, 0.25);
+	color: #fff;
 }
 
 #btn-play-main svg {
@@ -422,7 +448,35 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 #bottom-speed-slider {
-	width: 120px;
+	width: 100px;
+}
+
+/* Speed +/- buttons */
+.speed-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	background: var(--surface);
+	color: rgba(255, 255, 255, 0.7);
+	font-size: 18px;
+	font-family: inherit;
+	cursor: pointer;
+	transition: all 0.15s ease;
+	user-select: none;
+}
+
+.speed-btn:hover {
+	background: rgba(255, 255, 255, 0.08);
+	border-color: rgba(255, 255, 255, 0.15);
+	color: #fff;
+}
+
+.speed-btn:active {
+	background: rgba(255, 255, 255, 0.12);
 }
 
 /* Status area in bottom bar */
@@ -446,8 +500,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .status-dot.live {
-	background: var(--accent);
-	box-shadow: 0 0 8px rgba(0, 255, 136, 0.5);
+	background: #fff;
+	box-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
 }
 
 /* Block counter */
@@ -462,7 +516,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .spacebar-hint {
 	font-size: 9px;
 	letter-spacing: 1px;
-	color: rgba(255, 255, 255, 0.15);
+	color: rgba(255, 255, 255, 0.1);
 	text-transform: uppercase;
 	position: absolute;
 	bottom: 4px;

@@ -283,5 +283,52 @@ suite('Fountain Parser', () => {
         assert.strictEqual(blocks.length, 1);
         assert.strictEqual(blocks[0].characterName, 'MATT');
     });
+    test('whitespace-only line continues dialogue (Fountain paragraph break)', () => {
+        const text = [
+            '',
+            'MATT',
+            'First paragraph of dialogue.',
+            '  ',
+            'Second paragraph of dialogue.',
+            '',
+        ].join('\n');
+        const blocks = (0, fountainParser_1.parseFountainDialogue)(text);
+        assert.strictEqual(blocks.length, 1);
+        assert.strictEqual(blocks[0].characterName, 'MATT');
+        assert.strictEqual(blocks[0].dialogueText, 'First paragraph of dialogue.\n\nSecond paragraph of dialogue.');
+    });
+    test('truly empty line ends dialogue, whitespace-only does not', () => {
+        const text = [
+            '',
+            'MATT',
+            'First part.',
+            '  ',
+            'Still Matt talking.',
+            '',
+            'SARAH',
+            'Different character.',
+            '',
+        ].join('\n');
+        const blocks = (0, fountainParser_1.parseFountainDialogue)(text);
+        assert.strictEqual(blocks.length, 2);
+        assert.strictEqual(blocks[0].characterName, 'MATT');
+        assert.strictEqual(blocks[0].dialogueText, 'First part.\n\nStill Matt talking.');
+        assert.strictEqual(blocks[1].characterName, 'SARAH');
+    });
+    test('multiple whitespace paragraph breaks within dialogue', () => {
+        const text = [
+            '',
+            'MATT',
+            'Paragraph one.',
+            '  ',
+            'Paragraph two.',
+            '  ',
+            'Paragraph three.',
+            '',
+        ].join('\n');
+        const blocks = (0, fountainParser_1.parseFountainDialogue)(text);
+        assert.strictEqual(blocks.length, 1);
+        assert.strictEqual(blocks[0].dialogueText, 'Paragraph one.\n\nParagraph two.\n\nParagraph three.');
+    });
 });
 //# sourceMappingURL=fountainParser.test.js.map

@@ -38,20 +38,23 @@ export class TeleprompterPanel {
 		const existing = TeleprompterPanel.panels.get(key);
 
 		if (existing) {
-			existing.panel.reveal(vscode.ViewColumn.Beside);
+			existing.panel.reveal();
 			return existing;
 		}
 
 		const panel = vscode.window.createWebviewPanel(
 			TeleprompterPanel.viewType,
 			`Teleprompter: ${fileName(document)}`,
-			vscode.ViewColumn.Beside,
+			{ viewColumn: vscode.ViewColumn.Active, preserveFocus: false },
 			{
 				enableScripts: true,
 				localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media')],
 				retainContextWhenHidden: true,
 			},
 		);
+
+		// Move to a new editor group so it can be popped out to its own window
+		vscode.commands.executeCommand('workbench.action.moveEditorToNewWindow');
 
 		const instance = new TeleprompterPanel(panel, extensionUri, document);
 		TeleprompterPanel.panels.set(key, instance);
@@ -265,12 +268,17 @@ export class TeleprompterPanel {
 	<title>Teleprompter</title>
 </head>
 <body>
-	<!-- Top toolbar: display settings -->
+	<!-- Invisible hover zone to reveal toolbar -->
+	<div id="toolbar-trigger"></div>
+
+	<!-- Top toolbar: display settings (hidden by default) -->
 	<div id="toolbar">
 		<div class="toolbar-group">
 			<label>width</label>
+			<button class="step-btn" id="btn-width-down" title="Narrower (-50)">-</button>
 			<input type="range" id="width-slider" min="200" max="1200" value="600" step="25">
 			<span class="mono-value" id="width-value">600</span>
+			<button class="step-btn" id="btn-width-up" title="Wider (+50)">+</button>
 		</div>
 		<div class="toolbar-separator"></div>
 		<div class="toolbar-group">
@@ -300,8 +308,10 @@ export class TeleprompterPanel {
 		<div class="toolbar-separator"></div>
 		<div class="toolbar-group">
 			<label>guide</label>
+			<button class="step-btn" id="btn-guide-down" title="Higher (-5%)">-</button>
 			<input type="range" id="guide-slider" min="10" max="80" value="35" step="1">
 			<span class="mono-value" id="guide-value">35</span><span class="mono-value">%</span>
+			<button class="step-btn" id="btn-guide-up" title="Lower (+5%)">+</button>
 		</div>
 		<div class="toolbar-separator"></div>
 		<div class="toolbar-group">
@@ -321,7 +331,7 @@ export class TeleprompterPanel {
 	<!-- Reading position indicator (arrow on left) -->
 	<div id="reading-indicator">
 		<svg width="28" height="28" viewBox="0 0 28 28">
-			<polygon points="0,6 22,14 0,22" fill="#00ff88" opacity="0.7"/>
+			<polygon points="0,6 22,14 0,22" fill="#ffffff" opacity="0.7"/>
 		</svg>
 	</div>
 
@@ -330,7 +340,10 @@ export class TeleprompterPanel {
 		<div id="dialogue-area"></div>
 	</div>
 
-	<!-- Bottom control bar: play, speed, status -->
+	<!-- Invisible hover zone to reveal bottom bar -->
+	<div id="bottom-trigger"></div>
+
+	<!-- Bottom control bar: play, speed, status (hidden by default) -->
 	<div id="bottom-bar">
 		<div class="bottom-status">
 			<span class="status-dot" id="status-dot"></span>
@@ -339,8 +352,10 @@ export class TeleprompterPanel {
 
 		<div class="bottom-group">
 			<label>spd</label>
+			<button class="speed-btn" id="btn-speed-down" title="Slower (-5)">-</button>
 			<input type="range" id="bottom-speed-slider" min="0" max="100" value="20" step="1">
 			<span class="mono-value" id="bottom-speed-value">20</span>
+			<button class="speed-btn" id="btn-speed-up" title="Faster (+5)">+</button>
 		</div>
 
 		<button id="btn-play-main" title="Play / Pause (Space)">

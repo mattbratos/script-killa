@@ -57,14 +57,16 @@ class TeleprompterPanel {
         const key = document.uri.toString();
         const existing = TeleprompterPanel.panels.get(key);
         if (existing) {
-            existing.panel.reveal(vscode.ViewColumn.Beside);
+            existing.panel.reveal();
             return existing;
         }
-        const panel = vscode.window.createWebviewPanel(TeleprompterPanel.viewType, `Teleprompter: ${fileName(document)}`, vscode.ViewColumn.Beside, {
+        const panel = vscode.window.createWebviewPanel(TeleprompterPanel.viewType, `Teleprompter: ${fileName(document)}`, { viewColumn: vscode.ViewColumn.Active, preserveFocus: false }, {
             enableScripts: true,
             localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media')],
             retainContextWhenHidden: true,
         });
+        // Move to a new editor group so it can be popped out to its own window
+        vscode.commands.executeCommand('workbench.action.moveEditorToNewWindow');
         const instance = new TeleprompterPanel(panel, extensionUri, document);
         TeleprompterPanel.panels.set(key, instance);
         return instance;
@@ -222,41 +224,103 @@ class TeleprompterPanel {
 	<title>Teleprompter</title>
 </head>
 <body>
+	<!-- Invisible hover zone to reveal toolbar -->
+	<div id="toolbar-trigger"></div>
+
+	<!-- Top toolbar: display settings (hidden by default) -->
 	<div id="toolbar">
 		<div class="toolbar-group">
-			<button id="btn-play" title="Play / Pause (Space)">&#9654; Play</button>
+			<label>width</label>
+			<button class="step-btn" id="btn-width-down" title="Narrower (-50)">-</button>
+			<input type="range" id="width-slider" min="200" max="1200" value="600" step="25">
+			<span class="mono-value" id="width-value">600</span>
+			<button class="step-btn" id="btn-width-up" title="Wider (+50)">+</button>
 		</div>
+		<div class="toolbar-separator"></div>
 		<div class="toolbar-group">
-			<label>Speed</label>
-			<input type="range" id="speed-slider" min="0" max="100" value="20" step="1">
-			<span id="speed-value">20</span>
+			<label>size</label>
+			<button id="btn-size-down" title="Decrease font size">-</button>
+			<span class="mono-value" id="font-size-value">32</span>
+			<button id="btn-size-up" title="Increase font size">+</button>
 		</div>
+		<div class="toolbar-separator"></div>
 		<div class="toolbar-group">
-			<label>Size</label>
-			<button id="btn-size-down" title="Decrease font size">A-</button>
-			<span id="font-size-value">32</span>
-			<button id="btn-size-up" title="Increase font size">A+</button>
-		</div>
-		<div class="toolbar-group">
-			<label>Font</label>
+			<label>font</label>
 			<select id="font-select">
-				<option value="sans-serif">Sans Serif</option>
-				<option value="serif">Serif</option>
-				<option value="monospace">Monospace</option>
-				<option value="Georgia, serif">Georgia</option>
-				<option value="'Courier New', monospace">Courier New</option>
+				<option value="'SF Mono', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', monospace" selected>Mono</option>
+				<option value="'Inter', 'Segoe UI', system-ui, sans-serif">Sans</option>
+				<option value="'Georgia', 'Times New Roman', serif">Serif</option>
+				<option value="'Courier New', 'Courier', monospace">Courier</option>
+				<option value="monospace">System Mono</option>
 			</select>
 		</div>
+		<div class="toolbar-separator"></div>
+		<div class="toolbar-group">
+			<label>align</label>
+			<button id="btn-align-left" class="align-btn active" title="Align left">L</button>
+			<button id="btn-align-center" class="align-btn" title="Align center">C</button>
+			<button id="btn-align-right" class="align-btn" title="Align right">R</button>
+		</div>
+		<div class="toolbar-separator"></div>
+		<div class="toolbar-group">
+			<label>guide</label>
+			<button class="step-btn" id="btn-guide-down" title="Higher (-5%)">-</button>
+			<input type="range" id="guide-slider" min="10" max="80" value="35" step="1">
+			<span class="mono-value" id="guide-value">35</span><span class="mono-value">%</span>
+			<button class="step-btn" id="btn-guide-up" title="Lower (+5%)">+</button>
+		</div>
+		<div class="toolbar-separator"></div>
 		<div class="toolbar-group">
 			<label>
 				<input type="checkbox" id="mirror-toggle">
-				Mirror
+				mirror
 			</label>
 		</div>
 	</div>
 
+	<!-- Dim overlay above reading line -->
+	<div id="dim-overlay"></div>
+
+	<!-- Reading guide line -->
+	<div id="reading-guide"></div>
+
+	<!-- Reading position indicator (arrow on left) -->
+	<div id="reading-indicator">
+		<svg width="28" height="28" viewBox="0 0 28 28">
+			<polygon points="0,6 22,14 0,22" fill="#ffffff" opacity="0.7"/>
+		</svg>
+	</div>
+
+	<!-- Main scroll area -->
 	<div id="teleprompter-container">
 		<div id="dialogue-area"></div>
+	</div>
+
+	<!-- Invisible hover zone to reveal bottom bar -->
+	<div id="bottom-trigger"></div>
+
+	<!-- Bottom control bar: play, speed, status (hidden by default) -->
+	<div id="bottom-bar">
+		<div class="bottom-status">
+			<span class="status-dot" id="status-dot"></span>
+			<span id="status-text">ready</span>
+		</div>
+
+		<div class="bottom-group">
+			<label>spd</label>
+			<button class="speed-btn" id="btn-speed-down" title="Slower (-5)">-</button>
+			<input type="range" id="bottom-speed-slider" min="0" max="100" value="20" step="1">
+			<span class="mono-value" id="bottom-speed-value">20</span>
+			<button class="speed-btn" id="btn-speed-up" title="Faster (+5)">+</button>
+		</div>
+
+		<button id="btn-play-main" title="Play / Pause (Space)">
+			<svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20"/></svg>
+		</button>
+
+		<div class="bottom-info" id="block-count">--</div>
+
+		<span class="spacebar-hint">space</span>
 	</div>
 
 	<script nonce="${nonce}" src="${jsUri}"></script>
@@ -271,7 +335,7 @@ function getConfig() {
     return {
         hiddenCharacters: cfg.get('hiddenCharacters', ['MATT']),
         fontSize: cfg.get('fontSize', 32),
-        fontFamily: cfg.get('fontFamily', 'sans-serif'),
+        fontFamily: cfg.get('fontFamily', "'SF Mono', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', monospace"),
         scrollSpeed: cfg.get('scrollSpeed', 20),
     };
 }
