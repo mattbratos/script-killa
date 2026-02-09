@@ -9,8 +9,43 @@ html, body {
 	height: 100%;
 	overflow: hidden;
 	background: #000;
-	color: #f0f0f0;
-	font-family: sans-serif;
+	color: #ededed;
+	font-family: 'SF Mono', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+}
+
+/* === Scanline overlay === */
+body::after {
+	content: '';
+	position: fixed;
+	inset: 0;
+	z-index: 200;
+	pointer-events: none;
+	background: repeating-linear-gradient(
+		0deg,
+		transparent,
+		transparent 2px,
+		rgba(0, 0, 0, 0.04) 2px,
+		rgba(0, 0, 0, 0.04) 4px
+	);
+}
+
+/* === Reading guide line === */
+#reading-guide {
+	position: fixed;
+	top: 38%;
+	left: 0;
+	right: 0;
+	height: 1px;
+	z-index: 90;
+	pointer-events: none;
+	background: linear-gradient(90deg,
+		transparent 0%,
+		rgba(0, 255, 136, 0.12) 15%,
+		rgba(0, 255, 136, 0.25) 50%,
+		rgba(0, 255, 136, 0.12) 85%,
+		transparent 100%
+	);
+	box-shadow: 0 0 20px rgba(0, 255, 136, 0.06);
 }
 
 /* === Toolbar === */
@@ -22,17 +57,18 @@ html, body {
 	z-index: 100;
 	display: flex;
 	align-items: center;
-	gap: 16px;
-	padding: 8px 16px;
-	background: rgba(20, 20, 20, 0.92);
-	border-bottom: 1px solid #333;
-	backdrop-filter: blur(8px);
-	transition: opacity 0.3s ease;
+	gap: 12px;
+	padding: 6px 14px;
+	background: rgba(0, 0, 0, 0.88);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+	backdrop-filter: blur(16px) saturate(120%);
+	transition: opacity 0.4s ease;
 	flex-wrap: wrap;
+	font-family: 'SF Mono', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
 }
 
 #toolbar.faded {
-	opacity: 0.15;
+	opacity: 0;
 	pointer-events: none;
 }
 
@@ -44,67 +80,114 @@ html, body {
 .toolbar-group {
 	display: flex;
 	align-items: center;
-	gap: 6px;
+	gap: 5px;
+}
+
+.toolbar-separator {
+	width: 1px;
+	height: 20px;
+	background: rgba(255, 255, 255, 0.08);
 }
 
 .toolbar-group label {
-	font-size: 11px;
+	font-size: 9px;
 	text-transform: uppercase;
-	letter-spacing: 0.5px;
-	color: #999;
+	letter-spacing: 1.5px;
+	color: rgba(255, 255, 255, 0.3);
 	user-select: none;
+	font-weight: 500;
 }
 
 #toolbar button {
-	padding: 4px 10px;
-	border: 1px solid #555;
+	padding: 3px 8px;
+	border: 1px solid rgba(255, 255, 255, 0.1);
 	border-radius: 4px;
-	background: #222;
-	color: #ddd;
-	font-size: 13px;
+	background: rgba(255, 255, 255, 0.04);
+	color: rgba(255, 255, 255, 0.7);
+	font-size: 11px;
+	font-family: inherit;
 	cursor: pointer;
-	transition: background 0.15s;
+	transition: all 0.15s ease;
+	letter-spacing: 0.3px;
 }
 
 #toolbar button:hover {
-	background: #444;
-}
-
-#toolbar button:active {
-	background: #555;
-}
-
-#toolbar button.active {
-	background: #1a6b3a;
-	border-color: #2a8b4a;
+	background: rgba(255, 255, 255, 0.08);
+	border-color: rgba(255, 255, 255, 0.15);
 	color: #fff;
 }
 
-#speed-slider {
-	width: 100px;
-	accent-color: #4ade80;
+#toolbar button:active {
+	background: rgba(255, 255, 255, 0.12);
 }
 
-#speed-value,
-#font-size-value {
-	font-size: 13px;
+#toolbar button.active {
+	background: rgba(0, 255, 136, 0.12);
+	border-color: rgba(0, 255, 136, 0.3);
+	color: #00ff88;
+	text-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+}
+
+/* Range sliders */
+input[type="range"] {
+	-webkit-appearance: none;
+	appearance: none;
+	height: 3px;
+	background: rgba(255, 255, 255, 0.1);
+	border-radius: 2px;
+	outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	background: #00ff88;
+	cursor: pointer;
+	box-shadow: 0 0 6px rgba(0, 255, 136, 0.4);
+	transition: box-shadow 0.15s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+	box-shadow: 0 0 12px rgba(0, 255, 136, 0.6);
+}
+
+#speed-slider {
+	width: 80px;
+}
+
+#width-slider {
+	width: 80px;
+}
+
+.mono-value {
+	font-size: 10px;
 	font-variant-numeric: tabular-nums;
-	min-width: 24px;
+	min-width: 22px;
 	text-align: center;
-	color: #ccc;
+	color: rgba(255, 255, 255, 0.5);
+	letter-spacing: 0.5px;
 }
 
 #font-select {
-	padding: 3px 6px;
-	border: 1px solid #555;
+	padding: 2px 4px;
+	border: 1px solid rgba(255, 255, 255, 0.1);
 	border-radius: 4px;
-	background: #222;
-	color: #ddd;
-	font-size: 13px;
+	background: rgba(255, 255, 255, 0.04);
+	color: rgba(255, 255, 255, 0.7);
+	font-size: 10px;
+	font-family: inherit;
+	cursor: pointer;
+}
+
+#font-select:hover {
+	border-color: rgba(255, 255, 255, 0.15);
 }
 
 #mirror-toggle {
-	accent-color: #4ade80;
+	accent-color: #00ff88;
 }
 
 /* === Teleprompter Container === */
@@ -117,7 +200,7 @@ html, body {
 	overflow-y: auto;
 	overflow-x: hidden;
 	scroll-behavior: auto;
-	padding-top: 56px; /* space for toolbar */
+	padding-top: 48px;
 }
 
 #teleprompter-container.mirrored {
@@ -125,25 +208,44 @@ html, body {
 }
 
 #dialogue-area {
-	max-width: 800px;
+	max-width: 600px;
 	margin: 0 auto;
-	padding: 40px 24px 100vh; /* extra bottom padding so last line can scroll to top */
+	padding: 40px 32px 100vh;
+	transition: max-width 0.3s ease;
 }
 
 /* === Dialogue Blocks === */
 .dialogue-block {
-	margin-bottom: 2em;
+	margin-bottom: 1.8em;
 	position: relative;
+	padding-left: 0;
+}
+
+/* Subtle left accent bar */
+.dialogue-block::before {
+	content: '';
+	position: absolute;
+	left: -16px;
+	top: 0;
+	bottom: 0;
+	width: 1px;
+	background: rgba(0, 255, 136, 0.08);
+	transition: background 0.3s;
+}
+
+.dialogue-block:hover::before {
+	background: rgba(0, 255, 136, 0.2);
 }
 
 .character-name {
-	font-size: 0.45em;
+	font-size: 0.35em;
 	text-transform: uppercase;
-	letter-spacing: 1.5px;
-	color: #666;
-	margin-bottom: 0.25em;
+	letter-spacing: 3px;
+	color: rgba(0, 255, 136, 0.35);
+	margin-bottom: 0.35em;
 	user-select: none;
 	pointer-events: none;
+	font-weight: 600;
 }
 
 .character-name.hidden {
@@ -151,37 +253,41 @@ html, body {
 }
 
 .dialogue-text {
-	line-height: 1.45;
-	color: #f0f0f0;
+	line-height: 1.5;
+	color: #ededed;
 	white-space: pre-wrap;
 	outline: none;
-	border-radius: 4px;
-	padding: 4px 6px;
-	margin: -4px -6px;
-	transition: background 0.2s ease;
+	border-radius: 2px;
+	padding: 6px 8px;
+	margin: -6px -8px;
+	transition: all 0.2s ease;
 	cursor: text;
+	letter-spacing: 0.2px;
 }
 
 .dialogue-text:focus {
-	background: rgba(255, 255, 255, 0.06);
+	background: rgba(255, 255, 255, 0.03);
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
 .dialogue-text.saved {
-	background: rgba(74, 222, 128, 0.12);
+	background: rgba(0, 255, 136, 0.06);
+	box-shadow: inset 0 0 0 1px rgba(0, 255, 136, 0.15);
 }
 
 /* Parenthetical label */
 .parenthetical {
-	font-size: 0.5em;
-	color: #888;
+	font-size: 0.4em;
+	color: rgba(255, 255, 255, 0.25);
 	font-style: italic;
-	margin-bottom: 0.15em;
+	margin-bottom: 0.2em;
 	user-select: none;
+	letter-spacing: 0.5px;
 }
 
 /* === Scrollbar === */
 #teleprompter-container::-webkit-scrollbar {
-	width: 6px;
+	width: 4px;
 }
 
 #teleprompter-container::-webkit-scrollbar-track {
@@ -189,21 +295,62 @@ html, body {
 }
 
 #teleprompter-container::-webkit-scrollbar-thumb {
-	background: #333;
-	border-radius: 3px;
+	background: rgba(255, 255, 255, 0.08);
+	border-radius: 2px;
 }
 
 #teleprompter-container::-webkit-scrollbar-thumb:hover {
-	background: #555;
+	background: rgba(255, 255, 255, 0.15);
 }
 
 /* === Empty state === */
 #dialogue-area:empty::after {
-	content: "No dialogue found.\a\aOpen a .fountain file and click the teleprompter button to get started.";
+	content: "> no dialogue found_\a\a  open a .fountain file\a  click the teleprompter button\a  start reading";
 	white-space: pre-wrap;
 	display: block;
-	text-align: center;
-	color: #555;
-	font-size: 18px;
+	text-align: left;
+	color: rgba(255, 255, 255, 0.15);
+	font-size: 14px;
+	font-family: inherit;
 	margin-top: 30vh;
+	margin-left: 20%;
+	letter-spacing: 0.5px;
+	line-height: 1.8;
+}
+
+/* === Status bar at bottom === */
+#status-bar {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 100;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 4px 14px;
+	background: rgba(0, 0, 0, 0.8);
+	border-top: 1px solid rgba(255, 255, 255, 0.04);
+	font-size: 9px;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.2);
+	font-family: inherit;
+	pointer-events: none;
+	backdrop-filter: blur(8px);
+}
+
+#status-bar .status-dot {
+	display: inline-block;
+	width: 5px;
+	height: 5px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.15);
+	margin-right: 6px;
+	transition: all 0.3s;
+}
+
+#status-bar .status-dot.live {
+	background: #00ff88;
+	box-shadow: 0 0 6px rgba(0, 255, 136, 0.5);
 }

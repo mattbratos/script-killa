@@ -441,39 +441,56 @@ var TeleprompterPanel = class _TeleprompterPanel {
 <body>
 	<div id="toolbar">
 		<div class="toolbar-group">
-			<button id="btn-play" title="Play / Pause (Space)">&#9654; Play</button>
+			<button id="btn-play" title="Play / Pause (Space)">> play</button>
 		</div>
+		<div class="toolbar-separator"></div>
 		<div class="toolbar-group">
-			<label>Speed</label>
+			<label>spd</label>
 			<input type="range" id="speed-slider" min="0" max="100" value="20" step="1">
-			<span id="speed-value">20</span>
+			<span class="mono-value" id="speed-value">20</span>
 		</div>
+		<div class="toolbar-separator"></div>
 		<div class="toolbar-group">
-			<label>Size</label>
-			<button id="btn-size-down" title="Decrease font size">A-</button>
-			<span id="font-size-value">32</span>
-			<button id="btn-size-up" title="Increase font size">A+</button>
+			<label>width</label>
+			<input type="range" id="width-slider" min="200" max="1200" value="600" step="25">
+			<span class="mono-value" id="width-value">600</span>
 		</div>
+		<div class="toolbar-separator"></div>
 		<div class="toolbar-group">
-			<label>Font</label>
+			<label>size</label>
+			<button id="btn-size-down" title="Decrease font size">-</button>
+			<span class="mono-value" id="font-size-value">32</span>
+			<button id="btn-size-up" title="Increase font size">+</button>
+		</div>
+		<div class="toolbar-separator"></div>
+		<div class="toolbar-group">
+			<label>font</label>
 			<select id="font-select">
-				<option value="sans-serif">Sans Serif</option>
-				<option value="serif">Serif</option>
-				<option value="monospace">Monospace</option>
-				<option value="Georgia, serif">Georgia</option>
-				<option value="'Courier New', monospace">Courier New</option>
+				<option value="'SF Mono', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', monospace" selected>Mono</option>
+				<option value="'Inter', 'Segoe UI', system-ui, sans-serif">Sans</option>
+				<option value="'Georgia', 'Times New Roman', serif">Serif</option>
+				<option value="'Courier New', 'Courier', monospace">Courier</option>
+				<option value="monospace">System Mono</option>
 			</select>
 		</div>
+		<div class="toolbar-separator"></div>
 		<div class="toolbar-group">
 			<label>
 				<input type="checkbox" id="mirror-toggle">
-				Mirror
+				mirror
 			</label>
 		</div>
 	</div>
 
+	<div id="reading-guide"></div>
+
 	<div id="teleprompter-container">
 		<div id="dialogue-area"></div>
+	</div>
+
+	<div id="status-bar">
+		<div><span class="status-dot" id="status-dot"></span><span id="status-text">ready</span></div>
+		<div id="block-count">--</div>
 	</div>
 
 	<script nonce="${nonce}" src="${jsUri}"></script>
@@ -487,7 +504,7 @@ function getConfig() {
   return {
     hiddenCharacters: cfg.get("hiddenCharacters", ["MATT"]),
     fontSize: cfg.get("fontSize", 32),
-    fontFamily: cfg.get("fontFamily", "sans-serif"),
+    fontFamily: cfg.get("fontFamily", "'SF Mono', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', monospace"),
     scrollSpeed: cfg.get("scrollSpeed", 20)
   };
 }

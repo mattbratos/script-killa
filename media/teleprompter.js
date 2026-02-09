@@ -16,22 +16,29 @@
 	const btnPlay = /** @type {HTMLButtonElement} */ (document.getElementById('btn-play'));
 	const speedSlider = /** @type {HTMLInputElement} */ (document.getElementById('speed-slider'));
 	const speedValue = /** @type {HTMLElement} */ (document.getElementById('speed-value'));
+	const widthSlider = /** @type {HTMLInputElement} */ (document.getElementById('width-slider'));
+	const widthValue = /** @type {HTMLElement} */ (document.getElementById('width-value'));
 	const btnSizeDown = /** @type {HTMLButtonElement} */ (document.getElementById('btn-size-down'));
 	const btnSizeUp = /** @type {HTMLButtonElement} */ (document.getElementById('btn-size-up'));
 	const fontSizeValue = /** @type {HTMLElement} */ (document.getElementById('font-size-value'));
 	const fontSelect = /** @type {HTMLSelectElement} */ (document.getElementById('font-select'));
 	const mirrorToggle = /** @type {HTMLInputElement} */ (document.getElementById('mirror-toggle'));
 	const toolbar = /** @type {HTMLElement} */ (document.getElementById('toolbar'));
+	const statusDot = /** @type {HTMLElement} */ (document.getElementById('status-dot'));
+	const statusText = /** @type {HTMLElement} */ (document.getElementById('status-text'));
+	const blockCount = /** @type {HTMLElement} */ (document.getElementById('block-count'));
 
 	// --- State ---
 	let isScrolling = false;
 	let scrollSpeed = 20; // px per second
 	let fontSize = 32;
-	let fontFamily = 'sans-serif';
+	let fontFamily = "'SF Mono', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', monospace";
+	let textWidth = 600; // max-width in px
 	/** @type {string[]} */
 	let hiddenCharacters = [];
 	let lastFrameTime = 0;
 	let animationId = 0;
+	let totalBlocks = 0;
 
 	// Wheel override: temporarily pause auto-scroll when user scrolls manually
 	let wheelPauseTimer = 0;
@@ -46,16 +53,20 @@
 	function startScroll() {
 		if (isScrolling) { return; }
 		isScrolling = true;
-		btnPlay.textContent = '⏸ Pause';
+		btnPlay.textContent = '|| pause';
 		btnPlay.classList.add('active');
+		statusDot.classList.add('live');
+		statusText.textContent = 'scrolling';
 		lastFrameTime = performance.now();
 		animationId = requestAnimationFrame(scrollFrame);
 	}
 
 	function stopScroll() {
 		isScrolling = false;
-		btnPlay.textContent = '▶ Play';
+		btnPlay.textContent = '> play';
 		btnPlay.classList.remove('active');
+		statusDot.classList.remove('live');
+		statusText.textContent = 'paused';
 		if (animationId) {
 			cancelAnimationFrame(animationId);
 			animationId = 0;
@@ -113,6 +124,8 @@
 		const scrollTop = container.scrollTop;
 
 		dialogueArea.innerHTML = '';
+		totalBlocks = blocks.length;
+		blockCount.textContent = totalBlocks + ' blocks';
 
 		for (const block of blocks) {
 			const wrapper = document.createElement('div');
@@ -165,6 +178,7 @@
 
 		// Apply current font settings
 		applyFontSettings();
+		applyWidth();
 	}
 
 	/**
@@ -215,6 +229,12 @@
 		fontSizeValue.textContent = String(fontSize);
 	}
 
+	function applyWidth() {
+		dialogueArea.style.maxWidth = textWidth + 'px';
+		widthValue.textContent = String(textWidth);
+		widthSlider.value = String(textWidth);
+	}
+
 	function setFontSize(/** @type {number} */ size) {
 		fontSize = Math.max(16, Math.min(72, size));
 		applyFontSettings();
@@ -231,6 +251,11 @@
 		speedSlider.value = String(speed);
 	}
 
+	function setTextWidth(/** @type {number} */ width) {
+		textWidth = Math.max(200, Math.min(1200, width));
+		applyWidth();
+	}
+
 	// --- Event Listeners ---
 
 	// Play/Pause button
@@ -239,6 +264,11 @@
 	// Speed slider
 	speedSlider.addEventListener('input', () => {
 		setScrollSpeed(parseInt(speedSlider.value, 10));
+	});
+
+	// Width slider
+	widthSlider.addEventListener('input', () => {
+		setTextWidth(parseInt(widthSlider.value, 10));
 	});
 
 	// Font size buttons
@@ -283,7 +313,7 @@
 
 	// Show toolbar on mouse move near top
 	document.addEventListener('mousemove', (e) => {
-		if (e.clientY < 80) {
+		if (e.clientY < 60) {
 			showToolbar();
 		}
 	});
@@ -321,6 +351,6 @@
 
 	// --- Init ---
 
-	// Tell the extension we're ready
+	applyWidth();
 	vscode.postMessage({ type: 'ready' });
 })();

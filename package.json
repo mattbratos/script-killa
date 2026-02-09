@@ -59,8 +59,21 @@
         },
         "script-killa.fontFamily": {
           "type": "string",
-          "default": "sans-serif",
-          "enum": ["sans-serif", "serif", "monospace", "Georgia, serif", "'Courier New', monospace"],
+          "default": "'SF Mono', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', monospace",
+          "enum": [
+            "'SF Mono', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', monospace",
+            "'Inter', 'Segoe UI', system-ui, sans-serif",
+            "'Georgia', 'Times New Roman', serif",
+            "'Courier New', 'Courier', monospace",
+            "monospace"
+          ],
+          "enumDescriptions": [
+            "Mono (SF Mono / Cascadia Code / JetBrains Mono)",
+            "Sans (Inter / Segoe UI / system)",
+            "Serif (Georgia / Times New Roman)",
+            "Courier New",
+            "System Monospace"
+          ],
           "description": "Default font family for the teleprompter display."
         },
         "script-killa.scrollSpeed": {
